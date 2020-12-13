@@ -1,28 +1,23 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-/*     "lib": [
+    "compilerOptions": {
+        "target": "es5",
+        /*     "lib": [
       "es2020"
     ], */
-    "module": "commonjs",
-    "rootDir": "src",
-    "outDir": "public",
-    "jsx": "react",
-    "strict": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "paths": {
-      "common/*": [
-        "src/common/*"
-      ],
-      "components/*": [
-        "src/components/*"
-      ],
-      "pages/*": [
-        "src/pages/*"
-      ],
-    }
-  },
-  "include": ["src", "custom.d.ts"]
+        "module": "commonjs",
+        "rootDir": "src",
+        "outDir": "public",
+        "jsx": "react",
+        "strict": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "downlevelIteration": true,
+        "baseUrl": ".",
+        "paths": {
+            "common/*": ["src/common/*"],
+            "components/*": ["src/components/*"],
+            "pages/*": ["src/pages/*"]
+        }
+    },
+    "include": ["src", "custom.d.ts"]
 }

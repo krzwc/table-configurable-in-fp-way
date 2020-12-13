@@ -1,6 +1,8 @@
 import React, { FunctionComponent } from 'react';
 import { Table as AntdTable } from 'antd';
 import { ColumnType } from 'antd/lib/table/interface';
+import { Task } from 'common/helpers';
+import { compose } from 'ramda';
 
 interface DataItem {
     key: string;
@@ -23,20 +25,6 @@ const columns: Column[] = [
             {
                 text: 'Jim',
                 value: 'Jim',
-            },
-            {
-                text: 'Submenu',
-                value: 'Submenu',
-                children: [
-                    {
-                        text: 'Green',
-                        value: 'Green',
-                    },
-                    {
-                        text: 'Black',
-                        value: 'Black',
-                    },
-                ],
             },
         ],
         onFilter: (value, record) => record.name.indexOf(String(value)) === 0,
@@ -95,5 +83,46 @@ const data: DataItem[] = [
         address: 'London No. 2 Lake Park',
     },
 ];
+const dataTask = Task.of(data);
 
-export const Table: FunctionComponent = () => <AntdTable columns={columns} dataSource={data} />;
+const isStringArray = (array: string[] | number[]): array is string[] => {
+    return (array as string[]).every((item) => typeof item === 'string');
+};
+
+const getFilterValues = (arr: string[] | number[]) =>
+    isStringArray(arr) ? arr.map((item) => item.split(' ')[0]) : arr;
+
+const makeFilterable = (data: DataItem[], columns: Column[]) => {
+    return columns.map((column) => ({
+        ...column,
+        filters: [...new Set(getFilterValues(data.map((dataItem) => dataItem[column.title])))].map((filter) => ({
+            text: filter,
+            value: filter,
+        })),
+        onFilter: (value: any, record: any) => record[String(column.title)].indexOf(String(value)) === 0,
+    }));
+};
+/* const makeSortable = () => {}; */
+
+export const Table: FunctionComponent = () => {
+    dataTask.fork(
+        console.error,
+        compose(
+            /* (columns) => <AntdTable columns={columns} dataSource={data} />, */
+            // eslint-disable-next-line no-console
+            console.log,
+            makeFilterable,
+            (data: DataItem[]) => ({
+                columns: Object.keys(data[0])
+                    .filter((key) => key !== 'key')
+                    .map((key) => ({
+                        title: key,
+                        dataIndex: key,
+                    })),
+                data,
+            }),
+        ),
+    );
+
+    return <AntdTable columns={columns} dataSource={data} />;
+};

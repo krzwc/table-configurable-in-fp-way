@@ -8,8 +8,7 @@ module.exports = {
             common: path.resolve(__dirname, 'src/common/'),
             components: path.resolve(__dirname, 'src/components/'),
             pages: path.resolve(__dirname, 'src/pages/'),
-            wrappers: path.resolve(__dirname, 'src/wrappers/'),
-        }
+        },
     },
     devServer: {
         contentBase: path.join(__dirname, 'public'),
@@ -20,7 +19,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'public'),
         filename: 'bundle.js',
-    }, 
+    },
     module: {
         rules: [
             {
@@ -44,7 +43,5 @@ module.exports = {
         ],
     },
     devtool: 'eval-cheap-module-source-map',
-    plugins: [
-        new ESLintPlugin(), 
-    ],
+    plugins: [new ESLintPlugin()],
 };

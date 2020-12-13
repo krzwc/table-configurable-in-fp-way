@@ -15,7 +15,7 @@ interface TaskFn {
 }
 
 interface TaskObj {
-    of?: FuncReturningTask;
+    of: FuncReturningTask;
     rejected?: FuncReturningTask;
     fromPromised?: any;
 }
