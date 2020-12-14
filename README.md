@@ -1,16 +1,1 @@
-- [x] styled components
-- [x] cypress
-- [ ] models type annotations
-- [ ] fetching layer
-- [ ] reverse proxy
-- [ ] api type guards
-- [ ] stricter eslint config
-- [ ] hot reloading
-- [ ] no data component
-- [ ] jest config
-- [ ] react testing library config
-- [ ] react refresh
-- [ ] env
-- [ ] root imports
-- [ ] unit tests
-- [ ] using selectros with react query?
+## FP-based table config
