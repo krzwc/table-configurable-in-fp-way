@@ -1,6 +1,6 @@
-import React, { FunctionComponent, ReactText } from 'react';
+import React, { FunctionComponent } from 'react';
 import { Table as AntdTable } from 'antd';
-import { ColumnType, ColumnFilterItem } from 'antd/lib/table/interface';
+import { ColumnType } from 'antd/lib/table/interface';
 import { Task } from 'common/helpers';
 import { compose, uniq, map, prop } from 'ramda';
 
@@ -13,7 +13,7 @@ interface DataItem {
 
 type Column = ColumnType<DataItem>;
 
-const columns: Column[] = [
+/* const columns: Column[] = [
     {
         title: 'Name',
         dataIndex: 'name',
@@ -55,7 +55,7 @@ const columns: Column[] = [
         sorter: (a, b) => a.address.length - b.address.length,
         sortDirections: ['descend', 'ascend'],
     },
-];
+]; */
 
 const data: DataItem[] = [
     {
@@ -97,16 +97,26 @@ interface TableDataAndColumns {
     columns: Column[];
 }
 
+const invokableCompose = compose as any;
+
 const makeFilterable = ({ data, columns }: TableDataAndColumns) => {
     return columns.map((column) => ({
         ...column,
-        filters: compose(
+        filters: invokableCompose(
             map((filter) => ({ text: filter, value: filter })),
             uniq,
             getFilterValues,
-            (data: DataItem[], column: Column) => map(prop([column.title]), data),
+            (data: DataItem[], column: Column) => {
+                return map(prop(column.title), data);
+            },
         )(data, column),
-        onFilter: (value: any, record: any) => record[String(column.title)].indexOf(String(value)) === 0,
+        onFilter: (value: string | number | boolean, record: DataItem) => {
+            return typeof value === 'number'
+                ? record[column.title as keyof DataItem] === value
+                : typeof value === 'string'
+                ? String(record[column.title as keyof DataItem]).startsWith(value)
+                : false;
+        },
     }));
 };
 /* const makeSortable = () => {}; */
