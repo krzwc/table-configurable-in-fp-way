@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { Table as AntdTable } from 'antd';
-import { ColumnType } from 'antd/lib/table/interface';
+import { ColumnType, CompareFn, SortOrder } from 'antd/lib/table/interface';
 import { Task } from 'common/helpers';
 import { compose, uniq, map, prop } from 'ramda';
 
@@ -12,50 +12,6 @@ interface DataItem {
 }
 
 type Column = ColumnType<DataItem>;
-
-/* const columns: Column[] = [
-    {
-        title: 'Name',
-        dataIndex: 'name',
-        filters: [
-            {
-                text: 'Joe',
-                value: 'Joe',
-            },
-            {
-                text: 'Jim',
-                value: 'Jim',
-            },
-        ],
-        onFilter: (value, record) => record.name.indexOf(String(value)) === 0,
-        sorter: (a, b) => a.name.length - b.name.length,
-        sortDirections: ['descend'],
-    },
-    {
-        title: 'Age',
-        dataIndex: 'age',
-        defaultSortOrder: 'descend',
-        sorter: (a, b) => a.age - b.age,
-    },
-    {
-        title: 'Address',
-        dataIndex: 'address',
-        filters: [
-            {
-                text: 'London',
-                value: 'London',
-            },
-            {
-                text: 'New York',
-                value: 'New York',
-            },
-        ],
-        filterMultiple: false,
-        onFilter: (value, record) => record.address.indexOf(String(value)) === 0,
-        sorter: (a, b) => a.address.length - b.address.length,
-        sortDirections: ['descend', 'ascend'],
-    },
-]; */
 
 const data: DataItem[] = [
     {
@@ -95,12 +51,17 @@ const getFilterValues = (arr: string[] | number[]) =>
 interface TableDataAndColumns {
     data: DataItem[];
     columns: Column[];
+    filters?: any;
+    onFilter?: any;
+    sorter?: CompareFn<DataItem>;
+    sortDirections?: SortOrder[];
 }
 
 const invokableCompose = compose as any;
 
-const makeFilterable = ({ data, columns }: TableDataAndColumns) => {
-    return columns.map((column) => ({
+const makeFilterable = ({ data, columns }: TableDataAndColumns) => ({
+    data,
+    columns: columns.map((column) => ({
         ...column,
         filters: invokableCompose(
             map((filter) => ({ text: filter, value: filter })),
@@ -117,17 +78,30 @@ const makeFilterable = ({ data, columns }: TableDataAndColumns) => {
                 ? String(record[column.title as keyof DataItem]).startsWith(value)
                 : false;
         },
-    }));
-};
-/* const makeSortable = () => {}; */
+    })),
+});
+
+const makeSortable = ({ data, columns }: TableDataAndColumns) => ({
+    data,
+    columns: columns.map((column) => ({
+        ...column,
+        sorter: (recordA: DataItem, recordB: DataItem) =>
+            typeof recordA[column.title as keyof DataItem] === 'number'
+                ? Number(recordA[column.title as keyof DataItem]) - Number(recordB[column.title as keyof DataItem])
+                : String(recordA[column.title as keyof DataItem]).length -
+                  String(recordB[column.title as keyof DataItem]).length,
+        sortDirections: ['descend', 'ascend'] as SortOrder[],
+    })),
+});
 
 export const Table: FunctionComponent = () => {
     return dataTask.fork(
         console.error,
         compose(
-            (columns) => <AntdTable columns={columns} dataSource={data} />,
+            ({ columns, data }) => <AntdTable columns={columns} dataSource={data} />,
             // eslint-disable-next-line no-console
             // console.log,
+            makeSortable,
             makeFilterable,
             (data: DataItem[]) => ({
                 columns: Object.keys(data[0])
