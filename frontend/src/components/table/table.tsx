@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react';
 import { Table as AntdTable } from 'antd';
 import { ColumnType, CompareFn, SortOrder } from 'antd/lib/table/interface';
 import { Task } from 'common/helpers';
-import { compose, uniq, map, prop } from 'ramda';
+import { compose, uniq, map, prop, identity } from 'ramda';
 
 interface DataItem {
     key: string;
@@ -39,7 +39,6 @@ const data: DataItem[] = [
         address: 'London No. 2 Lake Park',
     },
 ];
-const dataTask = Task.of(data);
 
 const isStringArray = (array: string[] | number[]): array is string[] => {
     return (array as string[]).every((item) => typeof item === 'string');
@@ -94,15 +93,18 @@ const makeSortable = ({ data, columns }: TableDataAndColumns) => ({
     })),
 });
 
-export const Table: FunctionComponent = () => {
-    return dataTask.fork(
+export const Table: FunctionComponent<{ filterable: boolean; sortable: boolean }> = ({
+    filterable = true,
+    sortable = true,
+}) => {
+    return Task.of(data).fork(
         console.error,
         compose(
             ({ columns, data }) => <AntdTable columns={columns} dataSource={data} />,
             // eslint-disable-next-line no-console
             // console.log,
-            makeSortable,
-            makeFilterable,
+            sortable ? makeSortable : identity,
+            filterable ? makeFilterable : identity,
             (data: DataItem[]) => ({
                 columns: Object.keys(data[0])
                     .filter((key) => key !== 'key')
